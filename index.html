@@ -61,6 +61,12 @@
         </div>
     </div>
 
+    <audio id="correct-sound" src="sounds/correct.mp3" preload="auto"></audio>
+    
+    <div class="hidden">
+        bg-green-200 bg-red-200
+    </div>
+
     <!-- Footer -->
     <footer class="bg-gray-800 text-white text-center py-4">
         <p class="text-sm">&copy; 2025 by DatDev. All rights reserved.</p>
@@ -157,14 +163,19 @@
             document.getElementById('question').textContent = questionData.question;
 
             const shuffledOptions = shuffle([...questionData.options]);
-
             const optionsDiv = document.getElementById('options');
             optionsDiv.innerHTML = '';
+
             shuffledOptions.forEach(option => {
                 const button = document.createElement('button');
-                button.className = 'w-full bg-gray-200 text-left px-4 py-2 rounded hover:bg-gray-300';
+                button.className = 'quiz-option w-full bg-gray-200 text-left px-4 py-2 rounded';
+                button.classList.add('hover:bg-gray-300'); 
                 button.textContent = option;
-                button.onclick = () => checkAnswer(option, questionData.correct);
+                button.dataset.option = option;
+                button.addEventListener('click', (e) => {
+                    const selectedOption = e.currentTarget.dataset.option;
+                    checkAnswer(selectedOption, questionData.correct);
+                });
                 optionsDiv.appendChild(button);
             });
 
@@ -172,6 +183,7 @@
             document.getElementById('next-btn').classList.add('hidden');
             updateProgressBar();
         }
+
 
         // Check answer
         function checkAnswer(selected, correct) {
@@ -183,10 +195,11 @@
                 score++;
                 feedbackDiv.className = 'mt-4 text-green-600';
                 feedbackDiv.textContent = 'Correct!';
-
-                const sound = document.getElementById('correct-sound');
-                sound.currentTime = 0;
-                sound.play();
+                setTimeout(() => {
+                    const sound = document.getElementById('correct-sound');
+                    sound.currentTime = 0;
+                    sound.play();
+                }, 50);
             } else {
                 feedbackDiv.className = 'mt-4 text-red-600';
                 feedbackDiv.textContent = `Wrong! The correct answer is: ${correct}`;
@@ -197,14 +210,19 @@
             nextBtn.onclick = nextQuestion;
 
             document.querySelectorAll('#options button').forEach(button => {
+                const optionValue = button.dataset.option;
                 button.disabled = true;
-                if (button.textContent === correct) {
+                button.classList.remove('hover:bg-gray-300');
+                button.offsetHeight; // Force reflow
+                if (optionValue === correct) {
                     button.classList.add('bg-green-200');
-                } else if (button.textContent === selected) {
+                } else if (optionValue === selected) {
                     button.classList.add('bg-red-200');
                 }
             });
+
         }
+
 
         // Load next question
         function nextQuestion() {
@@ -267,8 +285,6 @@
     <script>
         emailjs.init('TY1_DcQWKd6EI1wv6'); 
     </script>
-
-    <audio id="correct-sound" src="sounds/correct.mp3" preload="auto"></audio>
 </body>
 
 </html>
