@@ -62,7 +62,7 @@
     </div>
 
     <audio id="correct-sound" src="sounds/correct.mp3" preload="auto"></audio>
-    
+
     <div class="hidden">
         bg-green-200 bg-red-200
     </div>
@@ -169,7 +169,7 @@
             shuffledOptions.forEach(option => {
                 const button = document.createElement('button');
                 button.className = 'quiz-option w-full bg-gray-200 text-left px-4 py-2 rounded';
-                button.classList.add('hover:bg-gray-300'); 
+                button.classList.add('hover:bg-gray-300');
                 button.textContent = option;
                 button.dataset.option = option;
                 button.addEventListener('click', (e) => {
@@ -195,11 +195,9 @@
                 score++;
                 feedbackDiv.className = 'mt-4 text-green-600';
                 feedbackDiv.textContent = 'Correct!';
-                setTimeout(() => {
-                    const sound = document.getElementById('correct-sound');
-                    sound.currentTime = 0;
-                    sound.play();
-                }, 50);
+                const sound = document.getElementById('correct-sound');
+                sound.currentTime = 0;
+                sound.play();
             } else {
                 feedbackDiv.className = 'mt-4 text-red-600';
                 feedbackDiv.textContent = `Wrong! The correct answer is: ${correct}`;
