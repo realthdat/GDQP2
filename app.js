@@ -211,7 +211,7 @@ function updateCountdown() {
     const seconds = Math.floor((distance / 1000) % 60);
 
     document.getElementById('countdown-timer').textContent = 
-        `${days} ngày ${String(hours).padStart(2, '0')} giờ ${String(minutes).padStart(2, '0')} phút ${String(seconds).padStart(2, '0')} giây`;
+        `${String(hours).padStart(2, '0')} giờ ${String(minutes).padStart(2, '0')} phút ${String(seconds).padStart(2, '0')} giây`;
 }
 
 const countdownInterval = setInterval(updateCountdown, 1000);
