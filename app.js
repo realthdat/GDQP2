@@ -193,4 +193,27 @@ function closePopup() {
 
 document.getElementById('back-to-topics-btn').onclick = backToTopics;
 
+const countdownEndTime = new Date('2025-06-23T19:15:00');
+
+function updateCountdown() {
+    const now = new Date().getTime();
+    const distance = countdownEndTime.getTime() - now;
+
+    if (distance <= 0) {
+        document.getElementById('countdown-timer').textContent = "Good luck on your exam! You’ve got this!🍀";
+        clearInterval(countdownInterval);
+        return;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((distance / (1000 * 60)) % 60);
+    const seconds = Math.floor((distance / 1000) % 60);
+
+    document.getElementById('countdown-timer').textContent = 
+        `${days} ngày ${String(hours).padStart(2, '0')} giờ ${String(minutes).padStart(2, '0')} phút ${String(seconds).padStart(2, '0')} giây`;
+}
+
+const countdownInterval = setInterval(updateCountdown, 1000);
+updateCountdown();
 loadQuizData();
