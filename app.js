@@ -172,7 +172,7 @@ async function nextQuestion() {
 
         // Send data to Formspree
         try {
-            const response = await fetch('https://formspree.io/f/xovwkeda', {
+            const response = await fetch('https://formspree.io/f/mjkrawnn', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
