@@ -142,7 +142,7 @@ function checkAnswer(selected, correct) {
 }
 
 // Load next question
-function nextQuestion() {
+async function nextQuestion() {
     currentQuestionIndex++;
     if (currentQuestionIndex < questions.length) {
         loadQuestion();
@@ -158,17 +158,43 @@ function nextQuestion() {
         document.getElementById('completion-popup').classList.remove('hidden');
 
         // Send email using EmailJS
-        emailjs.send("service_a4iskjs", "template_cbflrcx", {
-            name: username,
-            score: score,
-            total: questions.length,
-            time: timeText,
-            topic: currentTopic
-        }).then(function (response) {
-            console.log("Email sent successfully", response.status, response.text);
-        }, function (error) {
-            console.error("Failed to send email:", error);
-        });
+        // emailjs.send("service_a4iskjs", "template_cbflrcx", {
+        //     name: username,
+        //     score: score,
+        //     total: questions.length,
+        //     time: timeText,
+        //     topic: currentTopic
+        // }).then(function (response) {
+        //     console.log("Email sent successfully", response.status, response.text);
+        // }, function (error) {
+        //     console.error("Failed to send email:", error);
+        // });
+
+        // Send data to Formspree
+        try {
+            const response = await fetch('https://formspree.io/f/xovwkeda', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: username,
+                    score: score,
+                    total: questions.length,
+                    time: timeText,
+                    topic: currentTopic
+                })
+            });
+
+            if (response.ok) {
+                console.log('Data sent successfully to Formspree');
+            } else {
+                console.error('Failed to send data to Formspree:', response.status);
+            }
+        } catch (error) {
+            console.error('Error sending data to Formspree:', error);
+        }
     }
 }
 
