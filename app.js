@@ -8,6 +8,7 @@ let score = 0;
 
 function startApp() {
     const input = document.getElementById('username-input').value.trim();
+    console.log("Username entered:", input);
     if (input === '') {
         alert("Please enter your name.");
         return;
@@ -16,7 +17,6 @@ function startApp() {
     document.getElementById('user-popup').classList.add('hidden');
 }
 
-// Fetch quiz data from JSON file
 async function loadQuizData() {
     try {
         const response = await fetch('quizData.json');
@@ -32,7 +32,6 @@ async function loadQuizData() {
     }
 }
 
-// Shuffle array function
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -41,7 +40,6 @@ function shuffle(array) {
     return array;
 }
 
-// Load topics
 function loadTopics() {
     const topicsDiv = document.getElementById('topics');
     topicsDiv.innerHTML = '';
@@ -54,8 +52,8 @@ function loadTopics() {
     });
 }
 
-// Start quiz for selected topic
 function startQuiz(topic) {
+    console.log("Starting quiz for topic:", topic);
     currentTopic = topic;
     questions = shuffle([...quizData[topic]]);
     currentQuestionIndex = 0;
@@ -71,7 +69,6 @@ function startQuiz(topic) {
     loadQuestion();
 }
 
-// Update progress bar
 function updateProgressBar() {
     const progressBar = document.getElementById('progress-bar');
     const progressText = document.getElementById('progress-text');
@@ -80,7 +77,6 @@ function updateProgressBar() {
     progressText.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
 }
 
-// Load current question
 function loadQuestion() {
     const questionData = questions[currentQuestionIndex];
     document.getElementById('question').textContent = questionData.question;
@@ -106,7 +102,6 @@ function loadQuestion() {
     updateProgressBar();
 }
 
-// Check answer
 function checkAnswer(selected, correct) {
     const feedbackDiv = document.getElementById('feedback');
     const nextBtn = document.getElementById('next-btn');
@@ -141,59 +136,47 @@ function checkAnswer(selected, correct) {
     });
 }
 
-// Load next question
 async function nextQuestion() {
     currentQuestionIndex++;
+    console.log("Current question index:", currentQuestionIndex, "Total questions:", questions.length);
     if (currentQuestionIndex < questions.length) {
         loadQuestion();
     } else {
+        console.log("Quiz completed, preparing to send data...");
         const endTime = new Date();
         const duration = Math.floor((endTime - startTime) / 1000);
         const minutes = Math.floor(duration / 60);
         const seconds = duration % 60;
         const timeText = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+        const date = new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Ho_Chi_Minh' });
 
         document.getElementById('final-score-text').textContent = `You got ${score} out of ${questions.length} correct!`;
         document.getElementById('completion-time').textContent = `Time taken: ${timeText}`;
         document.getElementById('completion-popup').classList.remove('hidden');
 
-        // Send email using EmailJS
-        // emailjs.send("service_a4iskjs", "template_cbflrcx", {
-        //     name: username,
-        //     score: score,
-        //     total: questions.length,
-        //     time: timeText,
-        //     topic: currentTopic
-        // }).then(function (response) {
-        //     console.log("Email sent successfully", response.status, response.text);
-        // }, function (error) {
-        //     console.error("Failed to send email:", error);
-        // });
+        const dataToSend = {
+            date: date,
+            name: username,
+            topic: currentTopic,
+            score: score,
+            total: questions.length,
+            time: timeText
+        };
+        console.log("Data to send:", dataToSend);
 
-        // Send data to Formspree
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwCUcL9y33Qw_CdGDA6RAdXLvecBZlYMX6p32x5t6ZnP4Q7G3SboljetjN_ZGte1jSJ/exec'; 
         try {
-            const response = await fetch('https://formspree.io/f/xovwkeda', {
+            await fetch(scriptURL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json'
                 },
-                body: JSON.stringify({
-                    name: username,
-                    score: score,
-                    total: questions.length,
-                    time: timeText,
-                    topic: currentTopic
-                })
+                body: JSON.stringify(dataToSend),
+                mode: 'no-cors'
             });
-
-            if (response.ok) {
-                console.log('Data sent successfully to Formspree');
-            } else {
-                console.error('Failed to send data to Formspree:', response.status);
-            }
-        } catch (error) {
-            console.error('Error sending data to Formspree:', error);
+            console.log("Data sent to Google Sheets successfully");
+        } catch (err) {
+            console.error("Error sending data to Google Sheets:", err);
         }
     }
 }
@@ -236,7 +219,7 @@ function updateCountdown() {
     const minutes = Math.floor((distance / (1000 * 60)) % 60);
     const seconds = Math.floor((distance / 1000) % 60);
 
-    document.getElementById('countdown-timer').textContent = 
+    document.getElementById('countdown-timer').textContent =
         `${String(hours).padStart(2, '0')} giờ ${String(minutes).padStart(2, '0')} phút ${String(seconds).padStart(2, '0')} giây`;
 }
 
